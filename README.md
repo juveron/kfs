@@ -7,5 +7,7 @@ This is a own made operating system (OS)
 
 Todo - > title 
 
+
 `brew install i686-elf-gcc`
 
+`brew install qemu`
