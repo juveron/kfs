@@ -21,11 +21,15 @@ all: $(OBJSRC)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+multibootKernels:
+	qemu-system-i386 -kernel $(BIN)
+
 clean:
 	rm -f $(OBJSRC)
 	rm -f $(BIN)
+	rm -f $(BOOTDIR)$(BIN)
 
 fclean: clean
 	rm -f $(ISO)
 
-.PHONY: clean fclean
+.PHONY: clean fclean multibootKernels
