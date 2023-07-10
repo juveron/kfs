@@ -1,0 +1,5 @@
+.idea
+*.iso
+*.o
+*.bin
+isodir/boot/*.bin
