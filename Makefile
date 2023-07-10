@@ -27,3 +27,5 @@ clean:
 
 fclean: clean
 	rm -f $(ISO)
+
+.PHONY: clean fclean
