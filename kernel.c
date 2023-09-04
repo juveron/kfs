@@ -1,7 +1,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stdarg.h>
+// #include <stdio.h>
 
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -100,20 +101,6 @@ void terminal_initialize(void)
 		}
 	}
 }
-
-
-void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
-{
-    uint32_t descriptor;
-
-    descriptor  = (limit & 0x000F0000) | ((flag <<  8) & 0x00F0FF00) |
-                  ((base >> 16) & 0x000000FF) | (base & 0xFF000000);
-
-    printf("0x%.8X\n", descriptor);
-
-	// need to create a print kernel
-}
-
  
 void terminal_setcolor(uint8_t color) 
 {
@@ -128,11 +115,17 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
  
 void terminal_putchar(char c) 
 {
-	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-	if (++terminal_column == VGA_WIDTH) {
+	if (c == '\n') {
+		terminal_row++;
 		terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
+	}
+	else {
+		terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+		if (++terminal_column == VGA_WIDTH) {
+			terminal_column = 0;
+			if (++terminal_row == VGA_HEIGHT)
+				terminal_row = 0;
+		}
 	}
 }
  
@@ -146,13 +139,84 @@ void terminal_writestring(const char* data)
 {
 	terminal_write(data, strlen(data));
 }
- 
+
+void terminal_itoa_base(uint32_t num, uint32_t base) {
+	const char* b = "0123456789abcdef";
+
+	uint32_t divisor = 1;
+
+	while (divisor * base < num) {
+		divisor *= base;
+	}
+	while (divisor > 0) {
+		terminal_putchar(b[num / divisor]);
+		num = num % divisor;
+		divisor = divisor / base;
+	}
+}
+
+void printk(const char *s, ...) {
+	va_list	args;
+
+	va_start(args, s);
+	for (uint32_t i = 0 ; s[i] ; i++)
+	{
+		if (s[i] != '%') {
+			terminal_putchar(s[i]);
+			continue;
+		}
+
+		++i;
+		if (s[i] == '%') {
+			terminal_putchar('%');
+			continue;
+		}
+		else if (s[i] == 'c') {
+			terminal_color = VGA_COLOR_CYAN;
+			terminal_putchar(va_arg(args, int));
+			terminal_color = VGA_COLOR_WHITE;
+			continue;
+		}
+		else if (s[i] == 's') {
+			terminal_color = VGA_COLOR_LIGHT_BLUE;
+			terminal_writestring(va_arg(args, char *));
+			terminal_color = VGA_COLOR_WHITE;
+		}
+		else if (s[i] == 'd') {
+			terminal_color = VGA_COLOR_LIGHT_RED;
+			terminal_itoa_base(va_arg(args, uint32_t), 10);
+			terminal_color = VGA_COLOR_WHITE;
+			continue;
+		}
+		else if (s[i] == 'x') {
+			terminal_color = VGA_COLOR_LIGHT_MAGENTA;
+			terminal_writestring("0x");
+			terminal_itoa_base(va_arg(args, uint32_t), 16);
+			terminal_color = VGA_COLOR_WHITE;
+			continue;
+		}
+	}
+	va_end(args);
+}
+
+void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
+{
+    uint32_t descriptor;
+
+    descriptor  = (limit & 0x000F0000) | ((flag <<  8) & 0x00F0FF00) |
+                  ((base >> 16) & 0x000000FF) | (base & 0xFF000000);
+
+    printk("0x%.8X\n", descriptor);
+
+	// need to create a print kernel
+}
+
 void kernel_main(void) 
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
  
-	terminal_writestring("42\n");
+	printk("%s %d %x\n", "42", 42, 42);
 	
 	// terminal_writestring("\n");
 
