@@ -10,8 +10,8 @@ ISODIR = isodir/
 BOOT = src/boot
 KERNEL = src/kernel
 
-OBJSRC = src/$(patsubst %, %.o, $(BOOT))
-OBJSRC += src/$(patsubst %, %.o, $(KERNEL))
+OBJSRC = $(patsubst %, %.o, $(BOOT))
+OBJSRC += $(patsubst %, %.o, $(KERNEL))
 
 all: $(OBJSRC)
 	$(CC) -T linker.ld -o $(BIN) $(CFLAGS) $(OBJSRC) -lgcc
@@ -35,9 +35,9 @@ docker-run:
 	@docker run -d --name docker-kfs --rm -i -t docker-kfs 
 	@docker cp src/. docker-kfs:/kfs 
 	@docker cp grub.cfg docker-kfs:/kfs 
-	@docker exec -t docker-kfs nasm -f elf32 boot.s -o boot.o 
-	@docker exec -t docker-kfs gcc -m32 -ffreestanding ${CFLAGS} -c ${KERNEL} 
-	@docker exec -t docker-kfs ld -m elf_i386 -T linker.ld -o kfs.bin ${OBJSRC} 
+	@docker exec -t docker-kfs i686-elf-as boot.s -o boot.o 
+	@docker exec -t docker-kfs i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	@docker exec -t docker-kfs i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
 	docker exec -t docker-kfs mkdir -p isodir/boot/grub 
 	docker exec -t docker-kfs mv grub.cfg isodir/boot/grub 
 	docker exec -t docker-kfs mv kfs.bin isodir/boot 
