@@ -20,6 +20,7 @@ stack_top:
 .align 4
 
 # Définition des segments
+.global gdt_start
 gdt_start:
     # Descripteur de segment nul
     .quad 0x0
@@ -49,6 +50,7 @@ gdt_start:
     .quad 0x00CFFE000000FFFF
     .quad 0x0
 
+.global gdt_end
 gdt_end:
 
 .section .data
