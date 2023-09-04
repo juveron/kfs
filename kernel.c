@@ -101,20 +101,6 @@ void terminal_initialize(void)
 		}
 	}
 }
-
-
-// void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
-// {
-//     uint32_t descriptor;
-
-//     descriptor  = (limit & 0x000F0000) | ((flag <<  8) & 0x00F0FF00) |
-//                   ((base >> 16) & 0x000000FF) | (base & 0xFF000000);
-
-//     printf("0x%.8X\n", descriptor);
-
-// 	// need to create a print kernel
-// }
-
  
 void terminal_setcolor(uint8_t color) 
 {
@@ -213,6 +199,18 @@ void printk(const char *s, ...) {
 	va_end(args);
 }
 
+void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
+{
+    uint32_t descriptor;
+
+    descriptor  = (limit & 0x000F0000) | ((flag <<  8) & 0x00F0FF00) |
+                  ((base >> 16) & 0x000000FF) | (base & 0xFF000000);
+
+    printk("0x%.8X\n", descriptor);
+
+	// need to create a print kernel
+}
+
 void kernel_main(void) 
 {
 	/* Initialize terminal interface */
@@ -222,18 +220,18 @@ void kernel_main(void)
 	
 	// terminal_writestring("\n");
 
-	// create_descriptor(0, 0, 0);
+	create_descriptor(0, 0, 0);
 	// terminal_writestring("\n");
 
-    // create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
+    create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
 	// terminal_writestring("\n");
 
-    // create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
+    create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
 	// terminal_writestring("\n");
 
-    // create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
+    create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
 	// terminal_writestring("\n");
-    // create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
+    create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
 	// terminal_writestring("\n");
 
 }
