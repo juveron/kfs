@@ -18,10 +18,37 @@ stack_top:
   
 .section .data
 .align 4
+
+# Définition des segments
 gdt_start:
-    .quad 0x0  # Descriptor nul
-    .quad 0x00CF9A000000FFFF  # Descripteur de code
-    .quad 0x00CF92000000FFFF  # Descripteur de données
+    # Descripteur de segment nul
+    .quad 0x0
+    .quad 0x0
+
+    # Descripteur de code du noyau
+    .quad 0x00CF9A000000FFFF
+    .quad 0x0
+
+    # Descripteur de données du noyau
+    .quad 0x00CF92000000FFFF
+    .quad 0x0
+
+    # Descripteur de pile du noyau
+    .quad 0x00CFFA000000FFFF
+    .quad 0x0
+
+    # Descripteur de code utilisateur
+    .quad 0x00CFF2000000FFFF
+    .quad 0x0
+
+    # Descripteur de données utilisateur
+    .quad 0x00CFF0000000FFFF
+    .quad 0x0
+
+    # Descripteur de pile utilisateur
+    .quad 0x00CFFE000000FFFF
+    .quad 0x0
+
 gdt_end:
 
 .section .data
@@ -35,6 +62,7 @@ gdt_descriptor:
 _start: 
     mov $stack_top, %esp
 
+    # Chargez la GDT
     lgdt gdt_descriptor
 
     call kernel_main 
