@@ -218,7 +218,7 @@ void kernel_main(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
  
-	printk("%s\n", 42);
+	printk("%s %d %x\n", "42", 42, 42);
 	
 	// terminal_writestring("\n");
 
