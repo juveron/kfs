@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
- 
+
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
 #endif
@@ -9,6 +9,37 @@
 #if !defined(__i386__)
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
+
+#define SEG_DESCTYPE(x)  ((x) << 0x04)
+#define SEG_PRES(x)      ((x) << 0x07)
+#define SEG_SAVL(x)      ((x) << 0x0C)
+#define SEG_LONG(x)      ((x) << 0x0D)
+#define SEG_SIZE(x)      ((x) << 0x0E)
+#define SEG_GRAN(x)      ((x) << 0x0F)
+#define SEG_PRIV(x)      (((x) & 0x03) << 0x05)
+
+// Define segment flags using 32-bit integers
+#define SEG_DATA_RD       0x00
+#define SEG_DATA_RDWR     0x02
+#define SEG_CODE_EX       0x08
+#define SEG_CODE_EXRD     0x0A
+
+#define GDT_CODE_PL0 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                      SEG_PRIV(0)     | SEG_CODE_EXRD)
+
+#define GDT_DATA_PL0 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                      SEG_PRIV(0)     | SEG_DATA_RDWR)
+
+#define GDT_CODE_PL3 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                      SEG_PRIV(3)     | SEG_CODE_EXRD)
+
+#define GDT_DATA_PL3 (SEG_DESCTYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
+                      SEG_PRIV(3)     | SEG_DATA_RDWR)
+
  
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -68,6 +99,20 @@ void terminal_initialize(void)
 		}
 	}
 }
+
+
+// void create_descriptor(uint32_t base, uint32_t limit, uint16_t flag)
+// {
+//     uint32_t descriptor;
+
+//     descriptor  = (limit & 0x000F0000) | ((flag <<  8) & 0x00F0FF00) |
+//                   ((base >> 16) & 0x000000FF) | (base & 0xFF000000);
+
+//     // printf("0x%.8X\n", descriptor);
+
+// 	// need to create a print kernel
+// }
+
  
 void terminal_setcolor(uint8_t color) 
 {
@@ -107,4 +152,21 @@ void kernel_main(void)
 	terminal_initialize();
  
 	terminal_writestring("42\n");
+	
+	// terminal_writestring("\n");
+
+	// create_descriptor(0, 0, 0);
+	// terminal_writestring("\n");
+
+    // create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
+	// terminal_writestring("\n");
+
+    // create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
+	// terminal_writestring("\n");
+
+    // create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
+	// terminal_writestring("\n");
+    // create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
+	// terminal_writestring("\n");
+
 }
