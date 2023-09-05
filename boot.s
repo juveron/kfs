@@ -22,31 +22,31 @@ stack_top:
 # Définition des segments
 .global gdt_start
 gdt_start:
-    # Descripteur de segment nul
+    # Descripteur de segment null
     .quad 0x0
     .quad 0x0
 
-    # Descripteur de code du noyau
+    # Descripteur de code du kernel
     .quad 0x00CF9A000000FFFF
     .quad 0x0
 
-    # Descripteur de données du noyau
+    # Descripteur de data du kernel
     .quad 0x00CF92000000FFFF
     .quad 0x0
 
-    # Descripteur de pile du noyau
+    # Descripteur de stack du kernel
     .quad 0x00CFFA000000FFFF
     .quad 0x0
 
-    # Descripteur de code utilisateur
+    # Descripteur de code user
     .quad 0x00CFF2000000FFFF
     .quad 0x0
 
-    # Descripteur de données utilisateur
+    # Descripteur de data user
     .quad 0x00CFF0000000FFFF
     .quad 0x0
 
-    # Descripteur de pile utilisateur
+    # Descripteur de stack user
     .quad 0x00CFFE000000FFFF
     .quad 0x0
 
@@ -57,6 +57,11 @@ gdt_end:
 gdt_descriptor:
     .word gdt_end - gdt_start - 1
     .long gdt_start
+
+.global load_gdt
+load_gdt:
+    lgdt (%eax)
+    ret
 
 .section .text 
 .global _start 
