@@ -2,6 +2,7 @@ BIN = kfs.bin
 ISO = kfs.iso
 CC = i686-elf-gcc
 AS = i686-elf-as
+SCRIPT = install_grub.sh 
 CFLAGS += -ffreestanding -O2 -Wall -Werror -nostdlib
 
 BOOTDIR = isodir/boot/
@@ -27,9 +28,17 @@ all: $(OBJSRC)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-installPackage:
-	brew install $(CC)
+installQEMU:
 	brew install qemu
+
+installCOMPILATOR:
+	brew install $(CC)
+
+installDEPENDENCIES:
+	chmod +x $(SCRIPT)
+	./$(SCRIPT)
+addPath:
+	export PATH="$PWD/packages/bin:$PATH"
 
 startWithBIN:
 	qemu-system-i386 -kernel $(BOOTDIR)$(BIN)
@@ -43,4 +52,4 @@ clean:
 fclean: clean
 	rm -rf $(ISODIR)
 
-.PHONY: clean fclean startWithBIN startWithISO installPackage
+.PHONY: clean fclean startWithBIN startWithISO installQEMU installCOMPILATOR installDEPENDENCIES addPath
