@@ -37,8 +37,6 @@ installCOMPILATOR:
 installDEPENDENCIES:
 	chmod +x $(SCRIPT)
 	./$(SCRIPT)
-addPath:
-	export PATH="$PWD/packages/bin:$PATH"
 
 startWithBIN:
 	qemu-system-i386 -kernel $(BOOTDIR)$(BIN)

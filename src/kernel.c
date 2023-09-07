@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
