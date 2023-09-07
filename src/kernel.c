@@ -166,11 +166,62 @@ void printk(const char *s, ...) {
 	}
 	va_end(args);
 }
- 
+
+struct gdt_entry {
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t granularity;
+    uint8_t base_high;
+};
+
+struct gdt_ptr {
+    uint16_t limit;
+    uint32_t base;
+};
+
+extern void load_gdt(struct gdt_ptr* gdt_ptr);
+struct gdt_entry gdt[6];
+
+void init_gdt(void) {
+
+    gdt[0] = (struct gdt_entry) {0, 0, 0, 0, 0, 0};
+    gdt[1] = (struct gdt_entry) {0xFFFF, 0x0000, 0x00, 0x9A, 0xCF, 0x00};
+    gdt[2] = (struct gdt_entry) {0xFFFF, 0x0000, 0x00, 0x92, 0xCF, 0x00};
+    gdt[3] = (struct gdt_entry) {0xFFFF, 0x0000, 0x00, 0xFA, 0xCF, 0x00};
+    gdt[4] = (struct gdt_entry) {0xFFFF, 0x0000, 0x00, 0xF2, 0xCF, 0x00};
+    gdt[5] = (struct gdt_entry) {0xFFFF, 0x0000, 0x00, 0xF0, 0xCF, 0x00};
+
+    struct gdt_ptr gdt_ptr = {
+        .limit = sizeof(gdt) - 1,
+        .base = (uint32_t)&gdt[0]
+    };
+
+    load_gdt(&gdt_ptr);
+}
+
+
 void kernel_main(void) 
 {
+
+    init_gdt();
+
 	/* Initialize terminal interface */
 	terminal_initialize();
  
-	printk("%s %d %x\n", "42", 42, 42);
+	// printk("%s %d %x\n", "42", 42, 42);
+	
+    printk("GDT segments:\n");
+    for (int i = 0; i < 6; i++) {
+        struct gdt_entry* entry = &gdt[i];
+        printk("Segment %d:\n", i);
+        printk("  Limit Low: %x", entry->limit_low);
+        printk("  Base Low: %x", entry->base_low);
+        printk("  Base Middle: %x", entry->base_middle);
+        printk("  Access: %x\n", entry->access);
+        printk("  Granularity: %x", entry->granularity);
+        printk("  Base High: %x\n", entry->base_high);
+    }
+
 }
