@@ -50,4 +50,4 @@ clean:
 fclean: clean
 	rm -rf $(ISODIR)
 
-.PHONY: clean fclean startWithBIN startWithISO installQEMU installCOMPILATOR installDEPENDENCIES addPath
+.PHONY: clean fclean startWithBIN startWithISO installQEMU installCOMPILATOR installDEPENDENCIES

@@ -209,9 +209,7 @@ void kernel_main(void)
 
 	/* Initialize terminal interface */
 	terminal_initialize();
- 
-	// printk("%s %d %x\n", "42", 42, 42);
-	
+ 	
     printk("GDT segments:\n");
     for (int i = 0; i < 6; i++) {
         struct gdt_entry* entry = &gdt[i];
