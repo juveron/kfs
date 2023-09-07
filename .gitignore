@@ -3,3 +3,5 @@
 *.o
 *.bin
 isodir/boot/*.bin
+packages
+isodir
